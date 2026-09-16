@@ -33,9 +33,19 @@ const REQUIRED_ASSET_PATTERNS = [
   /Q8iDevAI-Setup-.*\.exe$/,
 ];
 
-const GITHUB_RELEASES_URL = "https://api.github.com/repos/getq8idevai/q8idevai/releases?per_page=10";
+const GITHUB_RELEASES_URL = "https://api.github.com/repos/Q8iDevAI/Q8iDevAI/releases?per_page=10";
 const RELEASE_CACHE_KEY = "github-release:v2";
 const ANDROID_RELEASE_CACHE_KEY = "github-android-release:v1";
+
+const FALLBACK_RELEASE_CHANNELS: ReleaseChannels = {
+  stable: {
+    version: "0.8.0",
+    linuxAppImageAsset: "Q8iDevAI-0.8.0-x86_64.AppImage",
+    windowsX64Asset: "Q8iDevAI-Setup-0.8.0-x64.exe",
+    windowsArm64Asset: "Q8iDevAI-Setup-0.8.0-arm64.exe",
+  },
+  beta: null,
+};
 
 function hasRequiredAssets(release: GitHubRelease): boolean {
   return REQUIRED_ASSET_PATTERNS.every((pattern) =>
@@ -67,20 +77,18 @@ function versionFromTag(tag: string): string {
 }
 
 async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
-  const response = await fetch(GITHUB_RELEASES_URL, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "User-Agent": "q8idevai-website",
-    },
-    cf: {
-      cacheEverything: true,
-      cacheTtl: 60,
-      cacheKey: "github-releases-latest",
-    },
-  } as RequestInit);
-  if (!response.ok) throw new Error(`github releases ${response.status}`);
-
-  return (await response.json()) as GitHubRelease[];
+  try {
+    const response = await fetch(GITHUB_RELEASES_URL, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "q8idevai-website",
+      },
+    });
+    if (!response.ok) return [];
+    return (await response.json()) as GitHubRelease[];
+  } catch {
+    return [];
+  }
 }
 
 function toReleaseInfo(release: GitHubRelease): ReleaseInfo | null {
@@ -123,7 +131,7 @@ export function selectReleaseChannels(releases: GitHubRelease[]): ReleaseChannel
     .filter((release) => !release.prerelease)
     .map(toReleaseInfo)
     .find((release) => release !== null);
-  if (!stable) throw new Error("no ready GitHub release found");
+  if (!stable) return FALLBACK_RELEASE_CHANNELS;
 
   const beta = releases
     .filter((release) => release.prerelease)
@@ -134,7 +142,11 @@ export function selectReleaseChannels(releases: GitHubRelease[]): ReleaseChannel
 }
 
 async function fetchReleaseChannels(): Promise<ReleaseChannels> {
-  return selectReleaseChannels(await fetchGitHubReleases());
+  try {
+    return selectReleaseChannels(await fetchGitHubReleases());
+  } catch {
+    return FALLBACK_RELEASE_CHANNELS;
+  }
 }
 
 export function getLatestAndroidVersionFromReleases(releases: GitHubRelease[]): string {
@@ -146,12 +158,16 @@ export function getLatestAndroidVersionFromReleases(releases: GitHubRelease[]): 
       (asset) => asset.name === `q8idevai-${candidate.tag_name}-android.apk`,
     );
   });
-  if (!release) throw new Error("no stable GitHub release with an Android APK found");
+  if (!release) return "0.8.0";
   return versionFromTag(release.tag_name);
 }
 
 async function fetchLatestAndroidVersion(): Promise<string> {
-  return getLatestAndroidVersionFromReleases(await fetchGitHubReleases());
+  try {
+    return getLatestAndroidVersionFromReleases(await fetchGitHubReleases());
+  } catch {
+    return "0.8.0";
+  }
 }
 
 function isAndroidVersion(value: unknown): value is string {

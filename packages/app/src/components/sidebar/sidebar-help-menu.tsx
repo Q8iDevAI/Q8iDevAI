@@ -52,31 +52,32 @@ const changelogLeadingIcon = (
 function HostVersionHint({ host }: { host: HostProfile }) {
   const { t } = useTranslation();
   const isConnected = useHostRuntimeIsConnected(host.serverId);
+  const daemonVersion = useSessionStore(
+    (state) => state.sessions[host.serverId]?.serverInfo?.version ?? null,
+  );
+  const version = isConnected
+    ? formatVersionWithPrefix(daemonVersion)
+    : t("settings.about.offline");
 
   return (
     <DropdownMenuHint
       style={styles.versionHint}
-      trailing={isConnected ? formatVersionWithPrefix(host.serverVersion) : null}
+      trailing={version}
       testID={`sidebar-help-host-version-${host.serverId}`}
     >
-      {host.displayName}
+      {host.label}
     </DropdownMenuHint>
   );
 }
 
 export function SidebarHelpMenu() {
   const { t } = useTranslation();
+  const shortcutsAvailable = useKeyboardShortcutsAvailable();
+  const openAppDiagnostic = useAppDiagnosticStore((state) => state.open);
+  const setShortcutsDialogOpen = useKeyboardShortcutsStore((state) => state.setShortcutsDialogOpen);
   const [open, setOpen] = useState(false);
   const version = formatVersionWithPrefix(resolveAppVersion());
   const hosts = useHosts();
-  const shortcutsAvailable = useKeyboardShortcutsAvailable();
-  const setShortcutsDialogOpen = useKeyboardShortcutsStore((state) => state.setDialogOpen);
-  const setDiagnosticOpen = useAppDiagnosticStore((state) => state.setOpen);
-  const activeSessionId = useSessionStore((state) => state.activeSessionId);
-
-  const openDiagnostics = useCallback(() => {
-    setDiagnosticOpen(true, activeSessionId);
-  }, [activeSessionId, setDiagnosticOpen]);
 
   const openKeyboardShortcuts = useCallback(() => {
     setShortcutsDialogOpen(true);
@@ -118,22 +119,22 @@ export function SidebarHelpMenu() {
             leading={shortcutsLeadingIcon}
             onSelect={openKeyboardShortcuts}
           >
-            {t("sidebar.help.keyboardShortcuts")}
+            {t("sidebar.help.shortcuts")}
           </DropdownMenuItem>
         ) : null}
-        <DropdownMenuItem
-          testID="sidebar-help-diagnostics"
-          leading={diagnosticLeadingIcon}
-          onSelect={openDiagnostics}
-        >
-          {t("sidebar.help.diagnostics")}
-        </DropdownMenuItem>
         <DropdownMenuItem
           testID="sidebar-help-changelog"
           leading={changelogLeadingIcon}
           onSelect={openChangelog}
         >
-          {t("sidebar.help.changelog")}
+          {t("sidebar.help.whatsNew")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          testID="sidebar-help-diagnostics"
+          leading={diagnosticLeadingIcon}
+          onSelect={openAppDiagnostic}
+        >
+          {t("sidebar.help.diagnostics")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>{t("sidebar.help.reportIssue")}</DropdownMenuLabel>

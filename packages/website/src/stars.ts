@@ -12,25 +12,24 @@ function formatStars(count: number): string {
   return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k`;
 }
 
-const GITHUB_REPO_URL = "https://api.github.com/repos/getq8idevai/q8idevai";
+const GITHUB_REPO_URL = "https://api.github.com/repos/Q8iDevAI/Q8iDevAI";
 const STARS_CACHE_KEY = "github-stars:v1";
 
 async function fetchStarCount(): Promise<string> {
-  const res = await fetch(GITHUB_REPO_URL, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "User-Agent": "q8idevai-website",
-    },
-    cf: {
-      cacheEverything: true,
-      cacheTtl: 60,
-      cacheKey: "github-repo-stars",
-    },
-  } as RequestInit);
-  if (!res.ok) throw new Error(`github repo ${res.status}`);
+  try {
+    const res = await fetch(GITHUB_REPO_URL, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "q8idevai-website",
+      },
+    });
+    if (!res.ok) return "0";
 
-  const repo = (await res.json()) as GitHubRepo;
-  return formatStars(repo.stargazers_count);
+    const repo = (await res.json()) as GitHubRepo;
+    return formatStars(repo.stargazers_count ?? 0);
+  } catch {
+    return "0";
+  }
 }
 
 function isStars(value: unknown): value is string {
