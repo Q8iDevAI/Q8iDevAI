@@ -1,0 +1,6 @@
+{
+  "id": "catppuccin",
+  "requirements": {
+    "q8idevai": ">=0.8.0"
+  }
+}

@@ -1,0 +1,35 @@
+import { createQ8iDevAIClient, type Q8iDevAIClient } from "@q8idevai/client";
+
+interface Issue {
+  id: string;
+  title: string;
+  description: string;
+  repositoryPath: string;
+}
+
+export async function startIssue(client: Q8iDevAIClient, issue: Issue) {
+  const workspace = await client.workspaces.open(issue.repositoryPath);
+  const agent = await workspace.agents.create({
+    config: {
+      provider: "codex/gpt-5.5",
+    },
+    title: issue.title,
+    labels: {
+      "issue-provider": "my-tracker",
+      "issue-id": issue.id,
+    },
+    prompt: [
+      `Implement issue ${issue.id}: ${issue.title}`,
+      "",
+      issue.description,
+      "",
+      "Run focused tests and summarize the result.",
+    ].join("\n"),
+  });
+
+  return { workspaceId: workspace.id, agentId: agent.id };
+}
+
+export function createClient(url: string): Q8iDevAIClient {
+  return createQ8iDevAIClient({ url });
+}

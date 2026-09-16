@@ -1,0 +1,6 @@
+{
+  "platforms": ["android"],
+  "android": {
+    "modules": ["sh.q8idevai.diffprototype.Q8iDevAIDiffPrototypeModule"]
+  }
+}

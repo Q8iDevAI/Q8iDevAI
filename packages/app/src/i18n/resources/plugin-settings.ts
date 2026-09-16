@@ -1,0 +1,68 @@
+const shared = {
+  directoryPlaceholder: "/absolute/path/on/host",
+  logs: {
+    action: "Logs",
+    title: "Logs: {{id}}",
+    loading: "Loading logs…",
+    refresh: "Refresh",
+    refreshing: "Refreshing…",
+    errorTitle: "Unable to load plugin logs",
+    empty: "No plugin output yet",
+  },
+} as const;
+
+export const pluginSettings = {
+  ar: {
+    ...shared,
+    screens: {
+      open: "فتح",
+      offline: "اتصل بهذا المضيف لفتح إعدادات الإضافة.",
+      update: "حدّث هذا المضيف لاستخدام إعدادات الإضافة.",
+      unavailable: "شاشة إعدادات الإضافة هذه غير متاحة.",
+    },
+    title: "الإضافات",
+    trustedTitle: "الإضافات تعليمات برمجية موثوقة",
+    trustedDescription:
+      "تعمل على هذا المضيف وداخل التطبيق دون عزل. ثبّت فقط التعليمات البرمجية التي تثق بها.",
+    globalTitle: "تفعيل الإضافات",
+    globalHint: "مفتاح عام لكل الإضافات المضبوطة",
+    directoryLabel: "مجلد الإضافة",
+    idLabel: "معرّف تثبيت الإضافة",
+    idHint: "اتركه فارغًا لاستخدام q8idevai-plugin.json",
+    idPlaceholder: "القيمة الافتراضية للبيان",
+    install: "تثبيت المجلد",
+    installing: "جارٍ التثبيت…",
+    status: { running: "قيد التشغيل", disabled: "معطّلة", failed: "فشلت" },
+    actions: {
+      reload: "إعادة تحميل",
+      reloading: "جارٍ إعادة التحميل…",
+      enable: "تفعيل",
+      enabling: "جارٍ التفعيل…",
+      disable: "تعطيل",
+      disabling: "جارٍ التعطيل…",
+      remove: "إزالة",
+      removing: "جارٍ الإزالة…",
+    },
+    feedback: {
+      installed: "تم تثبيت {{id}}",
+      reload: "تمت إعادة تحميل {{id}}",
+      enable: "تم تفعيل {{id}}",
+      disable: "تم تعطيل {{id}}",
+      remove: "تمت إزالة {{id}}",
+      kept: "تم الإبقاء على {{id}}",
+      globalEnabled: "تم تفعيل الإضافات",
+      globalDisabled: "تم تعطيل الإضافات",
+    },
+    removeConfirmTitle: "إزالة {{id}}؟",
+    removeConfirmMessage: "يؤدي هذا إلى إزالة الإعداد فقط. لن يُحذف مجلد المصدر.",
+    states: {
+      offlineTitle: "مضيف الإضافات غير متصل",
+      offlineDescription: "أعد الاتصال بهذا المضيف لإدارة إضافاته.",
+      updateTitle: "حدّث هذا المضيف لإدارة الإضافات",
+      loading: "جارٍ تحميل الإضافات…",
+      errorTitle: "تعذّر تحميل الإضافات",
+      retry: "إعادة المحاولة",
+      empty: "لا توجد إضافات مضبوطة",
+    },
+  },
+};

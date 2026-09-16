@@ -1,0 +1,5 @@
+appId: sh.q8idevai
+---
+- launchApp:
+    clearState: true
+- runFlow: flows/dev-client.yaml

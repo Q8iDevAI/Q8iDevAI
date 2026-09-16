@@ -1,0 +1,6 @@
+{
+  "id": "modal-ui-example",
+  "requirements": {
+    "q8idevai": ">=0.8.0"
+  }
+}

@@ -1,0 +1,84 @@
+export type SupportedLocale = "ar" | "en";
+export type AppLanguage = "system" | SupportedLocale;
+
+export interface LanguageOption {
+  value: AppLanguage;
+  labelKey: string;
+}
+
+export const DEFAULT_LOCALE: SupportedLocale = "en";
+
+export const LANGUAGE_OPTIONS: LanguageOption[] = [
+  { value: "system", labelKey: "settings.general.language.options.system" },
+  { value: "ar", labelKey: "settings.general.language.options.ar" },
+  { value: "en", labelKey: "settings.general.language.options.en" },
+];
+
+const SUPPORTED_LANGUAGES = new Set<AppLanguage>([
+  "system",
+  "ar",
+  "en",
+]);
+const LANGUAGE_NATIVE_NAMES: Record<SupportedLocale, string> = {
+  ar: "العربية",
+  en: "English",
+};
+const LANGUAGE_NAMES_BY_LOCALE: Record<SupportedLocale, Record<SupportedLocale, string>> = {
+  ar: {
+    ar: "العربية",
+    en: "الإنجليزية",
+  },
+  en: {
+    ar: "Arabic",
+    en: "English",
+  },
+};
+
+const REGIONAL_LANGUAGE_LOCALES: Readonly<Record<string, SupportedLocale>> = {
+  ar: "ar",
+  en: "en",
+};
+
+export function parseAppLanguage(value: unknown): AppLanguage | null {
+  return typeof value === "string" && SUPPORTED_LANGUAGES.has(value as AppLanguage)
+    ? (value as AppLanguage)
+    : null;
+}
+
+export function formatLanguageOptionLabel(
+  option: LanguageOption,
+  activeLocale: SupportedLocale,
+  systemLabel: string,
+): string {
+  if (option.value === "system") {
+    return systemLabel;
+  }
+
+  const nativeName = LANGUAGE_NATIVE_NAMES[option.value];
+  const activeLanguageName = LANGUAGE_NAMES_BY_LOCALE[activeLocale][option.value];
+  if (nativeName === activeLanguageName) {
+    return nativeName;
+  }
+
+  return `${nativeName} - ${activeLanguageName}`;
+}
+
+export function resolveSupportedLocale(
+  language: AppLanguage,
+  systemLocales: readonly string[],
+): SupportedLocale {
+  if (language !== "system") {
+    return language;
+  }
+
+  for (const locale of systemLocales) {
+    const normalized = locale.toLowerCase();
+    const baseLanguage = normalized.split("-", 1)[0];
+    const regionalLocale = REGIONAL_LANGUAGE_LOCALES[baseLanguage];
+    if (regionalLocale) {
+      return regionalLocale;
+    }
+  }
+
+  return DEFAULT_LOCALE;
+}

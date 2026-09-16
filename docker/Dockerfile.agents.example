@@ -1,0 +1,17 @@
+# Example child image that adds agent CLIs to the official Q8iDevAI image.
+#
+# Build:
+#   docker build -f docker/Dockerfile.agents.example -t q8idevai-with-agents .
+#
+# Then set `image: q8idevai-with-agents` in docker/docker-compose.example.yml.
+
+FROM ghcr.io/getq8idevai/q8idevai:latest
+
+USER root
+RUN npm install -g \
+  @anthropic-ai/claude-code \
+  @openai/codex \
+  opencode-ai
+
+# Leave the image user as root. The base entrypoint prepares mounted volumes,
+# then drops the daemon and launched agents to the non-root `q8idevai` user.

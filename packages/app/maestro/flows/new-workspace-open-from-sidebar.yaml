@@ -1,0 +1,17 @@
+# NOTE: Render through the workspace-create shell scripts before running when
+# using ${Q8IDEVAI_MAESTRO_*}. Maestro does not substitute environment vars.
+appId: ${Q8IDEVAI_MAESTRO_APP_ID}
+---
+# Start from an open Android sidebar with ${Q8IDEVAI_MAESTRO_PROJECT_NAME}
+# visible. Ends on the New Workspace screen.
+
+- assertVisible:
+    id: "sidebar-project-list"
+
+- assertVisible: ${Q8IDEVAI_MAESTRO_PROJECT_NAME}
+
+- tapOn: "Create a new workspace for ${Q8IDEVAI_MAESTRO_PROJECT_NAME}"
+
+- extendedWaitUntil:
+    visible: "New workspace"
+    timeout: 30000

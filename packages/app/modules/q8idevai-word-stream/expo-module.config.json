@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "apple"],
+  "android": {
+    "modules": ["sh.q8idevai.wordstream.WordStreamModule"]
+  },
+  "apple": {
+    "modules": ["WordStreamModule"]
+  }
+}

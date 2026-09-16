@@ -1,0 +1,43 @@
+import type { Q8iDevAIApi } from "@q8idevai/client";
+import type { ZodType, input as ZodInput, output as ZodOutput } from "zod";
+import type { PluginRpcContract } from "../rpc.js";
+import type { PluginCleanup } from "../contracts.js";
+import type { ProviderRegistration } from "./provider.js";
+import type { PluginLifecycleRegistration } from "./lifecycle.js";
+
+export interface PluginHandlerContext {
+  q8idevai: Q8iDevAIApi;
+}
+
+export type PluginSettingsState<Schema extends ZodType> =
+  | {
+      status: "ready";
+      revision: string;
+      values: ZodOutput<Schema>;
+    }
+  | {
+      status: "invalid";
+      revision: string;
+      error: string;
+    };
+
+export interface PluginSettings<Schema extends ZodType> {
+  read(): Promise<PluginSettingsState<Schema>>;
+  subscribe(listener: (state: PluginSettingsState<Schema>) => void | Promise<void>): PluginCleanup;
+}
+
+export interface PluginServerContext extends PluginLifecycleRegistration {
+  registerSettings<Schema extends ZodType>(
+    definition: import("../settings.js").SettingsDefinition<Schema>,
+  ): PluginSettings<Schema>;
+  handle<InputSchema extends ZodType, OutputSchema extends ZodType>(
+    contract: PluginRpcContract<InputSchema, OutputSchema>,
+    handler: (
+      input: ZodOutput<InputSchema>,
+      context: PluginHandlerContext,
+    ) => ZodInput<OutputSchema> | Promise<ZodInput<OutputSchema>>,
+  ): void;
+  registerProvider(provider: ProviderRegistration): void;
+}
+
+export type PluginServerContribution = (server: PluginServerContext) => PluginCleanup;

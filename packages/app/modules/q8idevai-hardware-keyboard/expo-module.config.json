@@ -1,0 +1,7 @@
+{
+  "platforms": ["ios"],
+  "ios": {
+    "modules": ["Q8iDevAIHardwareKeyboardModule"],
+    "reactDelegateHandlers": ["Q8iDevAIHardwareKeyboardReactDelegateHandler"]
+  }
+}
